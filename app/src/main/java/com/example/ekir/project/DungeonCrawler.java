@@ -23,8 +23,8 @@ class DungeonCrawler extends GameView {
     public class Camera {
         int x;
         int y;
-        int width=550;
-        int height=450;
+        int width=640; // Buffer width is 640, but only part of it is camera area
+        int height=360;
         public void focusOn(GameObject gameObject) {
             this.x=gameObject.x-(int)(this.width/2);
             this.y=gameObject.y-(int)(this.height/2);
@@ -168,7 +168,7 @@ class DungeonCrawler extends GameView {
     Controller controller;
     public DungeonCrawler(Context context) {
         super(context);
-        buffer=Bitmap.createBitmap(550,450, Bitmap.Config.RGB_565);
+        buffer=Bitmap.createBitmap(640,360, Bitmap.Config.RGB_565);
         gameObjects.add(new tree(200,400));
         gameObjects.add(player);
         gameObjects.add(MyTree);
@@ -411,8 +411,8 @@ class DungeonCrawler extends GameView {
             drawGameObject(canvas,gameObjects.get(i));
         }
         camera.focusOn(player);
-        drawPanel(canvas);
-        screenCanvas.drawBitmap(buffer,null,new Rect(0,0,1100,900),null);
+        screenCanvas.drawBitmap(buffer,null,new Rect(0,0,screenCanvas.getWidth(),screenCanvas.getHeight()),null);
+        drawPanel(screenCanvas);
         if(controller.move) {
             screenCanvas.drawLine(controller.touch_start_x, controller.touch_start_y, controller.touch_current_x, controller.touch_current_y, black);
         }
