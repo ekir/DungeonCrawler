@@ -196,7 +196,7 @@ class DungeonCrawler extends GameView {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        controller.moveRect=new Rect(0,0,w-200,h);
+        controller.moveRect=new Rect(0,0,virtScreen.width-panel_width,virtScreen.height);
         btn_Attack = new virtButton() {
             public void onClick() {
                 //player.x=10;
