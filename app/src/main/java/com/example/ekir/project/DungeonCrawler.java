@@ -20,6 +20,17 @@ import java.util.Random;
  */
 class DungeonCrawler extends GameView {
         Bitmap buffer;
+    int panel_width=100;
+    public class VirtScreen {
+        public float widthScale=1;
+        public float heightScale=1;
+        public int width=640;
+        public int height=360;
+        public Point convertPoint(Point input) {
+            return new Point((int)(input.x/widthScale),(int)(input.y/heightScale));
+        }
+    }
+    VirtScreen virtScreen=new VirtScreen();
     public class Camera {
         int x;
         int y;
@@ -94,7 +105,7 @@ class DungeonCrawler extends GameView {
             int NumberOfPoints = event.getPointerCount();
             points.clear();
             for(int n=0;n<NumberOfPoints;n++) {
-                points.add(new Point((int)event.getX(n),(int)event.getY(n)));
+                points.add(virtScreen.convertPoint(new Point((int)event.getX(n),(int)event.getY(n))));
             }
 
             if(event.getAction()==event.ACTION_UP || event.getAction()==event.ACTION_POINTER_UP) {
@@ -120,9 +131,9 @@ class DungeonCrawler extends GameView {
                 }
             }
 
-            for(int n=0;n<NumberOfPoints;n++) {
-                int x=(int)event.getX(n);
-                int y=(int)(int)event.getY(n);
+            for(int n=0;n<points.size();n++) {
+                int x=points.get(n).x;
+                int y=points.get(n).y;
                 boolean button_pressed=false;
 
                 for(i=0;i<virtButtonList.size();i++) {
@@ -195,7 +206,9 @@ class DungeonCrawler extends GameView {
                 }
             }
         };
-        btn_Attack.position=new Rect(w-200,h-200,w,h-100);
+        virtScreen.widthScale=w/virtScreen.width;
+        virtScreen.heightScale=h/virtScreen.height;
+        btn_Attack.position=new Rect(virtScreen.width-100,virtScreen.height-100,virtScreen.width,virtScreen.height-50);
         controller.add(btn_Attack);
     }
 
@@ -411,22 +424,24 @@ class DungeonCrawler extends GameView {
             drawGameObject(canvas,gameObjects.get(i));
         }
         camera.focusOn(player);
-        screenCanvas.drawBitmap(buffer,null,new Rect(0,0,screenCanvas.getWidth(),screenCanvas.getHeight()),null);
-        drawPanel(screenCanvas);
-        if(controller.move) {
-            screenCanvas.drawLine(controller.touch_start_x, controller.touch_start_y, controller.touch_current_x, controller.touch_current_y, black);
-        }
+        drawPanel(canvas);
         for(int n=0;n<controller.points.size();n++) {
             Point tmp_point=controller.points.get(n);
-            screenCanvas.drawCircle(tmp_point.x,tmp_point.y,50,black);
+            canvas.drawCircle(tmp_point.x,tmp_point.y,50,black);
         }
+        if(controller.move) {
+            canvas.drawLine(controller.touch_start_x, controller.touch_start_y, controller.touch_current_x, controller.touch_current_y, black);
+        }
+        screenCanvas.drawBitmap(buffer,null,new Rect(0,0,screenCanvas.getWidth(),screenCanvas.getHeight()),null);
+
+
 
     }
 
     public void drawPanel(Canvas canvas) {
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
-        canvas.drawRect(new Rect(controller.moveRect.right,0,canvas.getWidth(),canvas.getHeight()),paint);
+        canvas.drawRect(new Rect(canvas.getWidth()-panel_width,0,canvas.getWidth(),canvas.getHeight()),paint);
         paint.setColor(Color.RED);
         canvas.drawRect(btn_Attack.position,paint);
     }
