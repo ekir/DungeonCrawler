@@ -237,9 +237,11 @@ class DungeonCrawler extends GameView {
     public class Character extends GameObject {
         float speed=10;
         GameView gameView;
+        Bitmap looking_image[][] = new Bitmap[8][8];
         Bitmap attack_image[][] = new Bitmap[8][8];
         Bitmap running_image[][] = new Bitmap[8][8];
         boolean attack=false;
+        float lookState=0;
         int walkState=0;
         int attackState=0;
         public Bitmap[][] load_bitmap_360(String basename) {
@@ -261,6 +263,7 @@ class DungeonCrawler extends GameView {
             gameView=tgameView;
             //running_image=load_bitmap_360("running/running ");
             //attack_image=load_bitmap_360("attack/attack ");
+            looking_image=load_bitmap_360("ogre/looking ");
             running_image=load_bitmap_360("ogre/running ");
             attack_image=load_bitmap_360("ogre/attack ");
         }
@@ -293,8 +296,11 @@ class DungeonCrawler extends GameView {
         public Bitmap getBitmap() {
             if(attackState>0) {
                 return attack_image[getIndexByAngle()][attackState];
+            } else if(controller.move) {
+                return running_image[getIndexByAngle()][walkState];
+            } else {
+                return looking_image[getIndexByAngle()][(int)lookState];
             }
-            return running_image[getIndexByAngle()][walkState];
         }
 
         /*
@@ -340,12 +346,16 @@ class DungeonCrawler extends GameView {
                     x=new_x;
                     y=new_y;
                 }
+            } else {
+                lookState = lookState + 0.4f;
+                lookState = lookState % 8;
             }
         }
     }
     public class Ogre extends Character {
         public Ogre(GameView tgameView) {
             super(tgameView);
+            looking_image=load_bitmap_360("ogre/looking ");
             running_image=load_bitmap_360("ogre/running ");
             attack_image=load_bitmap_360("ogre/attack ");
         }
@@ -353,8 +363,9 @@ class DungeonCrawler extends GameView {
     public class Player extends Character {
         public Player(GameView tgameView) {
             super(tgameView);
-            running_image=load_bitmap_360("running/running ");
-            attack_image=load_bitmap_360("attack/attack ");
+            looking_image=load_bitmap_360("player/looking ");
+            running_image=load_bitmap_360("player/running ");
+            attack_image=load_bitmap_360("player/attack ");
         }
     }
     public class tree extends GameObject {
