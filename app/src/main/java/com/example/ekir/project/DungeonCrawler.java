@@ -21,6 +21,10 @@ import java.util.Random;
  * This class describes the itself. It extends GameView which is my game engine
  */
 class DungeonCrawler extends GameView {
+    public enum Action {
+        MOVE, LOOK, ATTACK
+    }
+
     public class DepthComparator implements Comparator<GameObject> {
         @Override
         public int compare(GameObject o1, GameObject o2) {
@@ -88,7 +92,6 @@ class DungeonCrawler extends GameView {
         public void add(virtButton button) {
             virtButtonList.add(button);
         }
-
         float dir_angle() {
             float math_dir_y=-dir_y;
             float result;
@@ -101,9 +104,6 @@ class DungeonCrawler extends GameView {
                 result+=360;
             }
             return result;
-
-
-
         }
         public Controller() {
             moveRect = new Rect(0,0,200,200);
@@ -233,8 +233,43 @@ class DungeonCrawler extends GameView {
         public int width;
         public int height;
         public abstract Bitmap getBitmap();
+        public float distance(GameObject target) {
+            float x_diff=target.x-x;
+            float y_diff=target.y-y;
+            return (float)Math.pow((double)(x_diff*x_diff+y_diff*y_diff),(float)0.5);
+        }
     }
     public class Character extends GameObject {
+        float dir_angle() {
+            float math_dir_y=-dir_y;
+            float result;
+            if(dir_x > 0) {
+                result= (float) Math.toDegrees(Math.asin(math_dir_y));
+            } else {
+                result= (float) 180-(float)Math.toDegrees(Math.asin(math_dir_y));
+            }
+            if(result<0) {
+                result+=360;
+            }
+            return result;
+        }
+        Action action=Action.LOOK;
+        public void move() {
+            action=Action.MOVE;
+            walkState = walkState + 1;
+            walkState = walkState % 8;
+            x=(int)(x+dir_x*speed);
+            y=(int)(y+dir_y*speed);
+        }
+        float dir_x;
+        float dir_y;
+        public void directTo(GameObject target) {
+            int x_diff=target.x-x;
+            int y_diff=target.y-y;
+            float length=vector_length(x_diff,y_diff);
+            dir_x=x_diff/length;
+            dir_y=y_diff/length;
+        }
         float speed=10;
         GameView gameView;
         Bitmap looking_image[][] = new Bitmap[8][8];
@@ -269,7 +304,7 @@ class DungeonCrawler extends GameView {
         }
 
         public int getIndexByAngle() {
-            float angle = controller.dir_angle();
+            float angle = dir_angle();
             if(angle <= 25) {
                 return 0;
             } else if(angle <=70) {
@@ -294,13 +329,15 @@ class DungeonCrawler extends GameView {
         }
 
         public Bitmap getBitmap() {
-            if(attackState>0) {
-                return attack_image[getIndexByAngle()][attackState];
-            } else if(controller.move) {
-                return running_image[getIndexByAngle()][walkState];
-            } else {
-                return looking_image[getIndexByAngle()][(int)lookState];
+            switch (action) {
+                case LOOK:
+                    return looking_image[getIndexByAngle()][(int) lookState];
+                case MOVE:
+                    return running_image[getIndexByAngle()][walkState];
+                case ATTACK:
+                    return attack_image[getIndexByAngle()][attackState];
             }
+            return looking_image[getIndexByAngle()][(int) lookState];
         }
 
         /*
@@ -324,7 +361,63 @@ class DungeonCrawler extends GameView {
             }
         }
         */
+        public void proceed() {
+            switch(action) {
+                case LOOK:
+                    lookState = lookState + 0.4f;
+                    lookState = lookState % 8;
+                    break;
+            }
+        }
         public void act() {
+            action=Action.LOOK;
+        }
+    }
+    public class Ogre extends Character {
+        public void act() {
+            super.act();
+            float distance_to_player=distance(player);
+            if(distance_to_player > 150) {
+                // To far away to notice
+                proceed(); // Continue with current action
+                return;
+            }
+            // Notices
+            directTo(player);
+            // Moves to player unless close enough
+            if(distance_to_player > 50) {
+                move();
+            }
+            proceed(); // Continue with current action
+        }
+        public Ogre(GameView tgameView) {
+            super(tgameView);
+            speed=7;
+            looking_image=load_bitmap_360("ogre/looking ");
+            running_image=load_bitmap_360("ogre/running ");
+            attack_image=load_bitmap_360("ogre/attack ");
+        }
+    }
+    public class Player extends Character {
+        public Bitmap getBitmap() {
+            if(attackState>0) {
+                return attack_image[getIndexByAngle()][attackState];
+            } else if(controller.move) {
+                return running_image[getIndexByAngle()][walkState];
+            } else {
+                return looking_image[getIndexByAngle()][(int)lookState];
+            }
+        }
+        public Player(GameView tgameView) {
+            super(tgameView);
+            looking_image=load_bitmap_360("player/looking ");
+            running_image=load_bitmap_360("player/running ");
+            attack_image=load_bitmap_360("player/attack ");
+        }
+        public void act() {
+            super.act();
+            dir_x=controller.dir_x;
+            dir_y=controller.dir_y;
             if(attack) {
                 if(attackState<7) {
                     attackState = attackState + 1;
@@ -350,22 +443,6 @@ class DungeonCrawler extends GameView {
                 lookState = lookState + 0.4f;
                 lookState = lookState % 8;
             }
-        }
-    }
-    public class Ogre extends Character {
-        public Ogre(GameView tgameView) {
-            super(tgameView);
-            looking_image=load_bitmap_360("ogre/looking ");
-            running_image=load_bitmap_360("ogre/running ");
-            attack_image=load_bitmap_360("ogre/attack ");
-        }
-    }
-    public class Player extends Character {
-        public Player(GameView tgameView) {
-            super(tgameView);
-            looking_image=load_bitmap_360("player/looking ");
-            running_image=load_bitmap_360("player/running ");
-            attack_image=load_bitmap_360("player/attack ");
         }
     }
     public class tree extends GameObject {
