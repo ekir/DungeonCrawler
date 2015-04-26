@@ -188,11 +188,14 @@ class DungeonCrawler extends GameView {
     public DungeonCrawler(Context context) {
         super(context);
         buffer=Bitmap.createBitmap(640,360, Bitmap.Config.RGB_565);
+        gameObjects.add(new Ogre(this));
         gameObjects.add(new tree(200,400));
         gameObjects.add(player);
         gameObjects.add(MyTree);
         controller = new Controller();
         this.setOnTouchListener(controller);
+        player.x=-120;
+        player.y=-100;
         player.width=190;
         player.height=190;
         MyTree.x=100;
@@ -340,9 +343,18 @@ class DungeonCrawler extends GameView {
             }
         }
     }
+    public class Ogre extends Character {
+        public Ogre(GameView tgameView) {
+            super(tgameView);
+            running_image=load_bitmap_360("ogre/running ");
+            attack_image=load_bitmap_360("ogre/attack ");
+        }
+    }
     public class Player extends Character {
         public Player(GameView tgameView) {
             super(tgameView);
+            running_image=load_bitmap_360("running/running ");
+            attack_image=load_bitmap_360("attack/attack ");
         }
     }
     public class tree extends GameObject {
