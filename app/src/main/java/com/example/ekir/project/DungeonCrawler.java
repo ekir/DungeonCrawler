@@ -13,12 +13,20 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 /**
  * This class describes the itself. It extends GameView which is my game engine
  */
 class DungeonCrawler extends GameView {
+    public class DepthComparator implements Comparator<GameObject> {
+        @Override
+        public int compare(GameObject o1, GameObject o2) {
+            return o1.y-o2.y;
+        }
+    }
         Bitmap buffer;
     int panel_width=100;
     public class VirtScreen {
@@ -223,7 +231,7 @@ class DungeonCrawler extends GameView {
         public int height;
         public abstract Bitmap getBitmap();
     }
-    public class Player extends GameObject {
+    public class Character extends GameObject {
         float speed=10;
         GameView gameView;
         Bitmap attack_image[][] = new Bitmap[8][8];
@@ -231,28 +239,137 @@ class DungeonCrawler extends GameView {
         boolean attack=false;
         int walkState=0;
         int attackState=0;
-        public Player(GameView tgameView) {
-            gameView=tgameView;
-            for(int i=0;i<8;i++)
-            {
-                attack_image[0][i] = load_bitmap("attack/attack e000" + Integer.toString(i) + ".png");
-                attack_image[1][i] = load_bitmap("attack/attack ne000" + Integer.toString(i) + ".png");
-                attack_image[2][i] = load_bitmap("attack/attack n000" + Integer.toString(i) + ".png");
-                attack_image[3][i] = load_bitmap("attack/attack nw000" + Integer.toString(i) + ".png");
-                attack_image[4][i] = load_bitmap("attack/attack w000" + Integer.toString(i) + ".png");
-                attack_image[5][i] = load_bitmap("attack/attack sw000" + Integer.toString(i) + ".png");
-                attack_image[6][i] = load_bitmap("attack/attack s000" + Integer.toString(i) + ".png");
-                attack_image[7][i] = load_bitmap("attack/attack se000" + Integer.toString(i) + ".png");
-
-                running_image[0][i] = load_bitmap("running/running e000" + Integer.toString(i) + ".png");
-                running_image[1][i] = load_bitmap("running/running ne000" + Integer.toString(i) + ".png");
-                running_image[2][i] = load_bitmap("running/running n000" + Integer.toString(i) + ".png");
-                running_image[3][i] = load_bitmap("running/running nw000" + Integer.toString(i) + ".png");
-                running_image[4][i] = load_bitmap("running/running w000" + Integer.toString(i) + ".png");
-                running_image[5][i] = load_bitmap("running/running sw000" + Integer.toString(i) + ".png");
-                running_image[6][i] = load_bitmap("running/running s000" + Integer.toString(i) + ".png");
-                running_image[7][i] = load_bitmap("running/running se000" + Integer.toString(i) + ".png");
+        public Bitmap[][] load_bitmap_360(String basename) {
+            Bitmap return_image[][]=new Bitmap[8][8];
+            for(int i=0;i<8;i++) {
+                return_image[0][i] = load_bitmap(basename+"e000" + Integer.toString(i) + ".png");
+                return_image[1][i] = load_bitmap(basename+"ne000" + Integer.toString(i) + ".png");
+                return_image[2][i] = load_bitmap(basename+"n000" + Integer.toString(i) + ".png");
+                return_image[3][i] = load_bitmap(basename+"nw000" + Integer.toString(i) + ".png");
+                return_image[4][i] = load_bitmap(basename+"w000" + Integer.toString(i) + ".png");
+                return_image[5][i] = load_bitmap(basename+"sw000" + Integer.toString(i) + ".png");
+                return_image[6][i] = load_bitmap(basename+"s000" + Integer.toString(i) + ".png");
+                return_image[7][i] = load_bitmap(basename+"se000" + Integer.toString(i) + ".png");
             }
+            return return_image;
+        }
+
+        public Character(GameView tgameView) {
+            gameView=tgameView;
+            //running_image=load_bitmap_360("running/running ");
+            //attack_image=load_bitmap_360("attack/attack ");
+            running_image=load_bitmap_360("ogre/running ");
+            attack_image=load_bitmap_360("ogre/attack ");
+        }
+
+        public int getIndexByAngle() {
+            float angle = controller.dir_angle();
+            if(angle <= 25) {
+                return 0;
+            } else if(angle <=70) {
+                return 1;
+            } else if(angle <=115) {
+                return 2;
+            } else if(angle <=160) {
+                return 3;
+            } else if(angle <= 205) {
+                return 4;
+            } else if(angle <= 250) {
+                return 5;
+            } else if(angle <= 295) {
+                return 6;
+            } else if(angle <= 340) {
+                return 7;
+            } else if(angle <= 385) {
+                return 0;
+            } else {
+                return 0;
+            }
+        }
+
+        public Bitmap getBitmap() {
+            if(attackState>0) {
+                return attack_image[getIndexByAngle()][attackState];
+            }
+            return running_image[getIndexByAngle()][walkState];
+        }
+
+        /*
+        public Bitmap getBitmapOld() {
+            if(controller.dir_x>=0) {
+                if(controller.dir_y > Math.sin(45)) {
+                    return player_image_south[walkState];
+                } else if (controller.dir_y < -Math.sin(45)) {
+                    return player_image_north[walkState];
+                } else {
+                    return player_image_east[walkState];
+                }
+            } else {
+                if(controller.dir_y > Math.sin(45)) {
+                    return player_image_south[walkState];
+                } else if (controller.dir_y < -Math.sin(45)) {
+                    return player_image_north[walkState];
+                } else {
+                    return player_image_west[walkState];
+                }
+            }
+        }
+        */
+        public void act() {
+            if(attack) {
+                if(attackState<7) {
+                    attackState = attackState + 1;
+                } else {
+                    attackState=0;
+                    attack=false;
+                }
+                if(attackState==4) {
+                    play_sound(snd_sword);
+                }
+                return;
+            }
+            if(controller.move) {
+                walkState = walkState + 1;
+                walkState = walkState % 8;
+                int new_x=(int)(x+controller.dir_x*speed);
+                int new_y=(int)(y+controller.dir_y*speed);
+                if(world.border.contains(new_x,new_y)){
+                    x=new_x;
+                    y=new_y;
+                }
+            }
+        }
+    }
+    public class Player extends Character {
+        float speed=10;
+        GameView gameView;
+        Bitmap attack_image[][] = new Bitmap[8][8];
+        Bitmap running_image[][] = new Bitmap[8][8];
+        boolean attack=false;
+        int walkState=0;
+        int attackState=0;
+        public Bitmap[][] load_bitmap_360(String basename) {
+            Bitmap return_image[][]=new Bitmap[8][8];
+            for(int i=0;i<8;i++) {
+                return_image[0][i] = load_bitmap(basename+"e000" + Integer.toString(i) + ".png");
+                return_image[1][i] = load_bitmap(basename+"ne000" + Integer.toString(i) + ".png");
+                return_image[2][i] = load_bitmap(basename+"n000" + Integer.toString(i) + ".png");
+                return_image[3][i] = load_bitmap(basename+"nw000" + Integer.toString(i) + ".png");
+                return_image[4][i] = load_bitmap(basename+"w000" + Integer.toString(i) + ".png");
+                return_image[5][i] = load_bitmap(basename+"sw000" + Integer.toString(i) + ".png");
+                return_image[6][i] = load_bitmap(basename+"s000" + Integer.toString(i) + ".png");
+                return_image[7][i] = load_bitmap(basename+"se000" + Integer.toString(i) + ".png");
+            }
+            return return_image;
+        }
+
+        public Player(GameView tgameView) {
+            super(tgameView);
+            gameView=tgameView;
+            //running_image=load_bitmap_360("running/running ");
+            //attack_image=load_bitmap_360("attack/attack ");
+            running_image=load_bitmap_360("ogre/running ");
+            attack_image=load_bitmap_360("ogre/attack ");
         }
 
         public int getIndexByAngle() {
@@ -419,6 +536,7 @@ class DungeonCrawler extends GameView {
         textpaint.setColor(Color.BLACK);
         canvas.drawText(Float.toString(controller.dir_angle()),50,50,textpaint);
 
+        Collections.sort(gameObjects, new DepthComparator());
         for(int i=0;i<gameObjects.size();i++) {
             gameObjects.get(i).act();
             drawGameObject(canvas,gameObjects.get(i));
