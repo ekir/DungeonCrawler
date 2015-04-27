@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Shader;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -21,6 +22,9 @@ import java.util.Random;
  * This class describes the itself. It extends GameView which is my game engine
  */
 class DungeonCrawler extends GameView {
+    int level=0;
+    GameObject stairsUp;
+    GameObject stairsDown;
     public enum Action {
         MOVE, LOOK, ATTACK
     }
@@ -188,20 +192,57 @@ class DungeonCrawler extends GameView {
     public DungeonCrawler(Context context) {
         super(context);
         buffer=Bitmap.createBitmap(640,360, Bitmap.Config.RGB_565);
-        gameObjects.add(new Ogre(this));
-        gameObjects.add(new tree(200,400));
-        gameObjects.add(player);
-        gameObjects.add(MyTree);
         controller = new Controller();
         this.setOnTouchListener(controller);
+        snd_sword = load_sound(R.raw.sword);
+        stairsUp = new StaticObject("stairsup.png");;
+        stairsDown = new StaticObject("stairsdown.png");;
+
+        load_level();
+    }
+
+    public void load_level() {
+        gameObjects.clear();
+        gameObjects.add(player);
+        switch(level) {
+            case 0:
+                load_level0();
+                break;
+            case 1:
+                load_level1();
+                break;
+            case 2:
+                load_level1();
+                break;
+        }
+    }
+
+    public void load_level0() {
+        gameObjects.add(new Ogre());
+        gameObjects.add(stairsDown);
+        ground_texture=load_bitmap("grass.jpg");
+        gameObjects.add(new tree(200,400));
+        gameObjects.add(MyTree);
         player.x=-120;
         player.y=-100;
         player.width=190;
         player.height=190;
         MyTree.x=100;
         MyTree.y=100;
-        snd_sword = load_sound(R.raw.sword);
-        grass_texture=load_bitmap("grass.jpg");
+        stairsUp.setPosition(-800,0);
+        stairsDown.setPosition(-300,-400);
+    }
+
+    public void load_level1() {
+        gameObjects.add(stairsUp);
+        gameObjects.add(stairsDown);
+        stairsDown.setPosition(-900,100);
+        stairsUp.setPosition(-300,-400);
+        ground_texture=load_bitmap("stone.png");
+    }
+
+    public abstract class Level {
+        public abstract void Load();
     }
 
     @Override
@@ -227,6 +268,10 @@ class DungeonCrawler extends GameView {
         return (float)Math.sqrt(x_diff*x_diff+y_diff*y_diff);
     }
     abstract class GameObject {
+        public void setPosition(int tx, int ty) {
+            x=tx;
+            y=ty;
+        }
         public abstract void act();
         public int x;
         public int y;
@@ -271,7 +316,6 @@ class DungeonCrawler extends GameView {
             dir_y=y_diff/length;
         }
         float speed=10;
-        GameView gameView;
         Bitmap looking_image[][] = new Bitmap[8][8];
         Bitmap attack_image[][] = new Bitmap[8][8];
         Bitmap running_image[][] = new Bitmap[8][8];
@@ -294,8 +338,7 @@ class DungeonCrawler extends GameView {
             return return_image;
         }
 
-        public Character(GameView tgameView) {
-            gameView=tgameView;
+        public Character() {
             //running_image=load_bitmap_360("running/running ");
             //attack_image=load_bitmap_360("attack/attack ");
             looking_image=load_bitmap_360("ogre/looking ");
@@ -390,8 +433,8 @@ class DungeonCrawler extends GameView {
             }
             proceed(); // Continue with current action
         }
-        public Ogre(GameView tgameView) {
-            super(tgameView);
+        public Ogre() {
+            super();
             speed=7;
             looking_image=load_bitmap_360("ogre/looking ");
             running_image=load_bitmap_360("ogre/running ");
@@ -408,8 +451,8 @@ class DungeonCrawler extends GameView {
                 return looking_image[getIndexByAngle()][(int)lookState];
             }
         }
-        public Player(GameView tgameView) {
-            super(tgameView);
+        public Player() {
+            super();
             looking_image=load_bitmap_360("player/looking ");
             running_image=load_bitmap_360("player/running ");
             attack_image=load_bitmap_360("player/attack ");
@@ -449,10 +492,6 @@ class DungeonCrawler extends GameView {
         int treeState=0;
         int treeDelay=0;
         Bitmap tree_image[] = new Bitmap[8];
-        public void setPosition(int tx, int ty) {
-            x=tx;
-            y=ty;
-        }
         public tree() {
             for(int i=0;i<7;i++) {
                 tree_image[i] = load_bitmap("background/fir A ani000"+Integer.toString(i)+".png");
@@ -483,6 +522,30 @@ class DungeonCrawler extends GameView {
             return tree_image[treeState];
         }
     }
+    public class StaticObject extends GameObject {
+        Bitmap image;
+        public void setPosition(int tx, int ty) {
+            x=tx;
+            y=ty;
+        }
+        public StaticObject(String filename) {
+           image = load_bitmap(filename);
+        }
+        public StaticObject(String filename,int tx,int ty) {
+            this(filename);
+            this.x=tx;
+            this.y=ty;
+        }
+
+        @Override
+        public void act() {
+        }
+
+        @Override
+        public Bitmap getBitmap() {
+            return image;
+        }
+    }
     public void drawGameObject(Canvas canvas,GameObject gameObject) {
         Bitmap image = gameObject.getBitmap();
         int radius_x = (image.getWidth()/2);
@@ -491,9 +554,9 @@ class DungeonCrawler extends GameView {
     }
 
     tree MyTree = new tree();
-    Player player = new Player(this);
+    Player player = new Player();
     int i=0;
-    Bitmap grass_texture=null;
+    Bitmap ground_texture;
     World world = new World(-1000,-1000,1000,1000);
     @Override
     public void gameLoop(Canvas screenCanvas) {
@@ -508,7 +571,7 @@ class DungeonCrawler extends GameView {
         //http://code.tutsplus.com/tutorials/android-sdk-drawing-with-pattern-fills--mobile-19527
         Paint background = new Paint();
         background.setColor(Color.YELLOW);
-        BitmapShader a = new BitmapShader(grass_texture,
+        BitmapShader a = new BitmapShader(ground_texture,
                 Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 
         //http://stackoverflow.com/questions/3719736/moving-a-path-with-a-repeating-bitmap-image-in-android
@@ -528,7 +591,20 @@ class DungeonCrawler extends GameView {
         textpaint.setTextSize(50);
         textpaint.setFakeBoldText(true);
         textpaint.setColor(Color.BLACK);
-        canvas.drawText(Float.toString(controller.dir_angle()),50,50,textpaint);
+        canvas.drawText(Float.toString(level),50,50,textpaint);
+        if(player.distance(stairsUp)<70) {
+            Log.d("hoj","Up");
+            level--;
+            load_level();
+            player.setPosition(stairsDown.x-100,stairsDown.y-100);
+        }
+
+        if(player.distance(stairsDown)<70) {
+            Log.d("hoj","Down");
+            level++;
+            load_level();
+            player.setPosition(stairsUp.x+100,stairsUp.y+100);
+        }
 
         Collections.sort(gameObjects, new DepthComparator());
         for(int i=0;i<gameObjects.size();i++) {
