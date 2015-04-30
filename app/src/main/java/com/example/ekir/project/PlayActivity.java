@@ -2,6 +2,7 @@ package com.example.ekir.project;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -19,15 +20,15 @@ import java.util.Random;
 /**
  * This activity handles the game itself
  */
-public class MainActivity extends Activity {
+public class PlayActivity extends Activity {
     DungeonCrawler dungeonCrawler;
-    DungeonCrawlerApplication app;
+    public void LaunchMenu() {
+        Intent intent = new Intent(PlayActivity.this, MenuActivity.class);
+        PlayActivity.this.startActivity(intent);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        app=(DungeonCrawlerApplication)getApplication();
-        app.init_music();
-        app.setMusic(true);
         dungeonCrawler = new DungeonCrawler(this);
         setContentView(dungeonCrawler);
         // http://stackoverflow.com/questions/12388771/how-to-set-activity-to-fullscreen-mode-in-android

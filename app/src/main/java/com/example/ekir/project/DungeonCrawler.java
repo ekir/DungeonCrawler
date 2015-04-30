@@ -1,5 +1,6 @@
 package com.example.ekir.project;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -80,6 +81,7 @@ class DungeonCrawler extends GameView {
         Rect position;
         public abstract void onClick();
     }
+    public virtButton btn_Menu;
     public virtButton btn_Attack;
     public ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
     public class Controller implements View.OnTouchListener {
@@ -249,6 +251,14 @@ class DungeonCrawler extends GameView {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         controller.moveRect=new Rect(0,0,virtScreen.width-panel_width,virtScreen.height);
+        btn_Menu = new virtButton() {
+            public void onClick() {
+                if(game_paused==false) {
+                    game_paused=true;
+                    ((PlayActivity) getContext()).LaunchMenu();
+                }
+            }
+        };
         btn_Attack = new virtButton() {
             public void onClick() {
                 //player.x=10;
@@ -260,7 +270,9 @@ class DungeonCrawler extends GameView {
         };
         virtScreen.widthScale=w/virtScreen.width;
         virtScreen.heightScale=h/virtScreen.height;
+        btn_Menu.position=new Rect(virtScreen.width-100,0,virtScreen.width,50);
         btn_Attack.position=new Rect(virtScreen.width-100,virtScreen.height-100,virtScreen.width,virtScreen.height-50);
+        controller.add(btn_Menu);
         controller.add(btn_Attack);
     }
 
@@ -591,7 +603,8 @@ class DungeonCrawler extends GameView {
         textpaint.setTextSize(50);
         textpaint.setFakeBoldText(true);
         textpaint.setColor(Color.BLACK);
-        canvas.drawText(Float.toString(level),50,50,textpaint);
+        canvas.drawText(Boolean.toString(game_paused),50,50,textpaint);
+        //canvas.drawText(Float.toString(level),50,50,textpaint);
         if(player.distance(stairsUp)<70) {
             Log.d("hoj","Up");
             level--;
@@ -631,6 +644,7 @@ class DungeonCrawler extends GameView {
         paint.setColor(Color.WHITE);
         canvas.drawRect(new Rect(canvas.getWidth()-panel_width,0,canvas.getWidth(),canvas.getHeight()),paint);
         paint.setColor(Color.RED);
+        canvas.drawRect(btn_Menu.position,paint);
         canvas.drawRect(btn_Attack.position,paint);
     }
 }

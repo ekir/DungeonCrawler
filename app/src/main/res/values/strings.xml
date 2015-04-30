@@ -1,8 +1,9 @@
 <resources>
+    <string name="about_text">Dungeon Crawler</string>
     <string name="app_name">Dungeon Crawler</string>
-
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_about">AboutActivity</string>
 </resources>
