@@ -20,12 +20,16 @@ import java.util.Random;
  * This activity handles the game itself
  */
 public class MainActivity extends Activity {
-    DungeonCrawler packmanHunt;
+    DungeonCrawler dungeonCrawler;
+    DungeonCrawlerApplication app;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        packmanHunt = new DungeonCrawler(this);
-        setContentView(packmanHunt);
+        app=(DungeonCrawlerApplication)getApplication();
+        app.init_music();
+        app.setMusic(true);
+        dungeonCrawler = new DungeonCrawler(this);
+        setContentView(dungeonCrawler);
         // http://stackoverflow.com/questions/12388771/how-to-set-activity-to-fullscreen-mode-in-android
     }
 
@@ -33,7 +37,7 @@ public class MainActivity extends Activity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            packmanHunt.setSystemUiVisibility(
+            dungeonCrawler.setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -47,18 +51,18 @@ public class MainActivity extends Activity {
 
     @Override public void onResume() {
         super.onResume();
-        packmanHunt.resume();
+        dungeonCrawler.resume();
     }
 
     @Override public void onPause() {
         super.onPause();
-        packmanHunt.pause();
+        dungeonCrawler.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        packmanHunt.destroy();
+        dungeonCrawler.destroy();
     }
 
 
