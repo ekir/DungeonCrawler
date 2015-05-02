@@ -220,9 +220,11 @@ class DungeonCrawler extends GameView {
     }
 
     public void load_level0() {
-        gameObjects.add(new Ogre());
+        gameObjects.add(new Ogre(0,0));
+        gameObjects.add(new Ogre(-100,0));
         gameObjects.add(stairsDown);
         ground_texture=load_bitmap("grass.jpg");
+        gameObjects.add(new Chef(300,100));
         gameObjects.add(new tree(200,400));
         gameObjects.add(MyTree);
         player.x=-120;
@@ -358,6 +360,12 @@ class DungeonCrawler extends GameView {
             attack_image=load_bitmap_360("ogre/attack ");
         }
 
+        public Character(int tx,int ty) {
+                this();
+                this.x=tx;
+                this.y=ty;
+        }
+
         public int getIndexByAngle() {
             float angle = dir_angle();
             if(angle <= 25) {
@@ -428,7 +436,7 @@ class DungeonCrawler extends GameView {
             action=Action.LOOK;
         }
     }
-    public class Ogre extends Character {
+    public class Chef extends Character {
         public void act() {
             super.act();
             float distance_to_player=distance(player);
@@ -445,8 +453,47 @@ class DungeonCrawler extends GameView {
             }
             proceed(); // Continue with current action
         }
+        public Chef(int tx,int ty) {
+            super(tx,ty);
+            load();
+        }
+        public Chef() {
+            super();
+            load();
+        }
+        public void load() {
+            speed=7;
+            looking_image=load_bitmap_360("chef/walking ");
+            running_image=load_bitmap_360("chef/walking ");
+            attack_image=load_bitmap_360("chef/walking ");
+        }
+    }
+    public class Ogre extends Character {
+        public void act() {
+            super.act();
+            float distance_to_player = distance(player);
+            if (distance_to_player > 150) {
+                // To far away to notice
+                proceed(); // Continue with current action
+                return;
+            }
+            // Notices
+            directTo(player);
+            // Moves to player unless close enough
+            if (distance_to_player > 50) {
+                move();
+            }
+            proceed(); // Continue with current action
+        }
+        public Ogre(int tx,int ty) {
+            super(tx,ty);
+            load();
+        }
         public Ogre() {
             super();
+            load();
+        }
+        public void load() {
             speed=7;
             looking_image=load_bitmap_360("ogre/looking ");
             running_image=load_bitmap_360("ogre/running ");
