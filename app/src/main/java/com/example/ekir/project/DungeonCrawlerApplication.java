@@ -13,6 +13,7 @@ import com.example.ekir.project.R;
  * but more activities might use it later
  */
 public class DungeonCrawlerApplication extends Application {
+    public boolean fastStart = true;
     public boolean gameStarted = false;
     private MediaPlayer MediaSpelaren = null;
     private boolean music=false;

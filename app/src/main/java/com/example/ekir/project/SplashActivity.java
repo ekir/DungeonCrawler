@@ -12,11 +12,15 @@ import android.view.MenuItem;
  * This activity handles the splash screen
  */
 public class SplashActivity extends Activity{
-
+        DungeonCrawlerApplication app;
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            final int wait_time = 2000;
+            app = (DungeonCrawlerApplication)getApplication();
+            int wait_time = 2000;
+            if(app.fastStart) {
+                wait_time=0;
+            }
             setContentView(R.layout.activity_splash);
 
             Handler handler = new Handler();

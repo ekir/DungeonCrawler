@@ -52,10 +52,16 @@ public class MenuActivity extends Activity{
         btn_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MenuActivity.this, PlayActivity.class);
-                MenuActivity.this.startActivity(intent);
+                startGame();
             }
         });
+        if(!app.gameStarted && app.fastStart) {
+            startGame();
+        }
+    }
+    public void startGame() {
+        Intent intent = new Intent(MenuActivity.this, PlayActivity.class);
+        MenuActivity.this.startActivity(intent);
     }
 
 }
