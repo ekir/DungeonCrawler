@@ -604,14 +604,14 @@ class DungeonCrawler extends GameView {
         textpaint.setFakeBoldText(true);
         textpaint.setColor(Color.BLACK);
         canvas.drawText(Float.toString(level),50,50,textpaint);
-        if(player.distance(stairsUp)<70) {
+        if(gameObjects.contains(stairsUp) && player.distance(stairsUp)<70) {
             Log.d("hoj","Up");
             level--;
             load_level();
             player.setPosition(stairsDown.x-100,stairsDown.y-100);
         }
 
-        if(player.distance(stairsDown)<70) {
+        if(gameObjects.contains(stairsDown) && player.distance(stairsDown)<70) {
             Log.d("hoj","Down");
             level++;
             load_level();
