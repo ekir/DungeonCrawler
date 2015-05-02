@@ -1,5 +1,6 @@
 package com.example.ekir.project;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -9,7 +10,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 
-public class MenuActivity extends ActionBarActivity {
+public class MenuActivity extends Activity{
     Button btn_resume;
     Button btn_play;
     Button btn_about;
@@ -25,6 +26,9 @@ public class MenuActivity extends ActionBarActivity {
         btn_play= (Button) findViewById(R.id.btn_play);
         btn_about= (Button) findViewById(R.id.btn_about);
         chk_music = (CheckBox) findViewById(R.id.chk_music);
+        if(app.gameStarted) {
+            btn_resume.setVisibility(View.VISIBLE);
+        }
         btn_resume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -20,8 +20,9 @@ import java.util.Random;
 /**
  * This activity handles the game itself
  */
-public class PlayActivity extends Activity {
+public class PlayActivity extends Activity{
     DungeonCrawler dungeonCrawler;
+    DungeonCrawlerApplication app;
     public void LaunchMenu() {
         Intent intent = new Intent(PlayActivity.this, MenuActivity.class);
         PlayActivity.this.startActivity(intent);
@@ -29,6 +30,8 @@ public class PlayActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        app=(DungeonCrawlerApplication)getApplication();
+        app.gameStarted=true;
         dungeonCrawler = new DungeonCrawler(this);
         setContentView(dungeonCrawler);
         // http://stackoverflow.com/questions/12388771/how-to-set-activity-to-fullscreen-mode-in-android

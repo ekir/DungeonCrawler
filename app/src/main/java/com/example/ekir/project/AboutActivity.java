@@ -1,12 +1,13 @@
 package com.example.ekir.project;
 
+import android.app.Activity;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class AboutActivity extends ActionBarActivity {
+public class AboutActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

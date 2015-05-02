@@ -603,8 +603,7 @@ class DungeonCrawler extends GameView {
         textpaint.setTextSize(50);
         textpaint.setFakeBoldText(true);
         textpaint.setColor(Color.BLACK);
-        canvas.drawText(Boolean.toString(game_paused),50,50,textpaint);
-        //canvas.drawText(Float.toString(level),50,50,textpaint);
+        canvas.drawText(Float.toString(level),50,50,textpaint);
         if(player.distance(stairsUp)<70) {
             Log.d("hoj","Up");
             level--;

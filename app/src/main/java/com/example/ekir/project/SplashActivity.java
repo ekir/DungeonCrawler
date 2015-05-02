@@ -1,5 +1,6 @@
 package com.example.ekir.project;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
@@ -10,7 +11,7 @@ import android.view.MenuItem;
 /**
  * This activity handles the splash screen
  */
-public class SplashActivity extends ActionBarActivity {
+public class SplashActivity extends Activity{
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
