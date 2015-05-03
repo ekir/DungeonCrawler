@@ -26,6 +26,7 @@ class DungeonCrawler extends GameView {
     int level=0;
     GameObject stairsUp;
     GameObject stairsDown;
+    Bubble bubble;
     public enum Action {
         MOVE, LOOK, ATTACK
     }
@@ -199,8 +200,8 @@ class DungeonCrawler extends GameView {
         snd_sword = load_sound(R.raw.sword);
         stairsUp = new StaticObject("stairsup.png");;
         stairsDown = new StaticObject("stairsdown.png");;
-
         load_level();
+        bubble=new Bubble(640-panel_width,360);
     }
 
     public void load_level() {
@@ -224,7 +225,7 @@ class DungeonCrawler extends GameView {
         gameObjects.add(new Ogre(-100,0));
         gameObjects.add(stairsDown);
         gameObjects.add(new King());
-        gameObjects.add(new StaticCharacter("queen/looking ",-200,-10));
+        gameObjects.add(new Queen(-200,-10));
         ground_texture=load_bitmap("grass.jpg");
         gameObjects.add(new Chef(300,100));
         gameObjects.add(new tree(200,400));
@@ -447,6 +448,7 @@ class DungeonCrawler extends GameView {
     }
     public class StaticCharacter extends Character {
         String basename="";
+        String speak=null;
         public void act() {
             super.act();
             float distance_to_player = distance(player);
@@ -478,12 +480,41 @@ class DungeonCrawler extends GameView {
 
         public King() {
             super("king/spricht ");
-            lookStateMax=6;
+            lookStateMax=5;
         }
 
         public King(int tx,int ty) {
             super("king/spricht ",tx,ty);
             lookStateMax=5;
+        }
+        public void act() {
+            super.act();
+            float distance_to_player=distance(player);
+            if(distance_to_player < 50) {
+                bubble.active=true;
+                bubble.speaker_image=getBitmap();
+                bubble.text="I WANT FOOD. SAVE THE CHEF";
+            }
+        }
+
+    }
+    public class Queen extends StaticCharacter {
+
+        public Queen() {
+            super("queen/looking ");
+        }
+
+        public Queen(int tx,int ty) {
+            super("queen/looking ",tx,ty);
+        }
+        public void act() {
+            super.act();
+            float distance_to_player=distance(player);
+            if(distance_to_player < 50) {
+                bubble.active=true;
+                bubble.speaker_image=getBitmap();
+                bubble.text="THE CHEF HAS BEEN KIDNAPPED.\n CAN YOU BRING HIM BACK?";
+            }
         }
 
     }
@@ -652,6 +683,42 @@ class DungeonCrawler extends GameView {
             return image;
         }
     }
+
+    class Bubble {
+        public boolean active=false;
+        public String text;
+        Bitmap bubble_image;
+        int x;
+        int y;
+        Bitmap speaker_image=null;
+        public Bubble(int screenbuffer_w,int screenbuffer_h) {
+            bubble_image=load_bitmap("bubble.png");
+            int margin=((screenbuffer_w/2)-(bubble_image.getWidth()/2));
+            x=margin;
+            y=screenbuffer_h-bubble_image.getHeight()-margin;
+        }
+        public void draw(Canvas canvas) {
+            if(!active) {
+                return;
+            }
+            canvas.drawBitmap(bubble_image,x,y,null);
+            if(speaker_image!=null) {
+                canvas.drawBitmap(speaker_image,x+10,y-5,null);
+            }
+
+            Paint textpaint = new Paint();
+            textpaint.setTextSize(20);
+            textpaint.setFakeBoldText(true);
+            textpaint.setColor(Color.BLACK);
+
+            int offset_y=0;
+            for (String line: bubble.text.split("\n")) {
+                canvas.drawText(line,x+100,y+30+offset_y,textpaint);
+                offset_y+=30;
+            }
+        }
+    }
+
     public void drawGameObject(Canvas canvas,GameObject gameObject) {
         Bitmap image = gameObject.getBitmap();
         int radius_x = (image.getWidth()/2);
@@ -664,6 +731,7 @@ class DungeonCrawler extends GameView {
     int i=0;
     Bitmap ground_texture;
     World world = new World(-1000,-1000,1000,1000);
+
     @Override
     public void gameLoop(Canvas screenCanvas) {
         Canvas canvas = new Canvas(buffer);
@@ -712,6 +780,8 @@ class DungeonCrawler extends GameView {
             player.setPosition(stairsUp.x+100,stairsUp.y+100);
         }
 
+        // We set bubble.actve to false, one of our objects might override it in act
+        bubble.active=false;
         Collections.sort(gameObjects, new DepthComparator());
         for(int i=0;i<gameObjects.size();i++) {
             gameObjects.get(i).act();
@@ -719,6 +789,7 @@ class DungeonCrawler extends GameView {
         }
         camera.focusOn(player);
         drawPanel(canvas);
+        bubble.draw(canvas);
         for(int n=0;n<controller.points.size();n++) {
             Point tmp_point=controller.points.get(n);
             canvas.drawCircle(tmp_point.x,tmp_point.y,50,black);
