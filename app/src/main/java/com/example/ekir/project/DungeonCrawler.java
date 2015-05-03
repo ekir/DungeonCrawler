@@ -26,7 +26,13 @@ class DungeonCrawler extends GameView {
     int level=0;
     GameObject stairsUp;
     GameObject stairsDown;
+    Chef chef = new Chef();
     Bubble bubble;
+    class Story {
+        boolean found_chef = false;
+        boolean delivered_chef = false;
+    }
+    Story story = new Story();
     public enum Action {
         MOVE, LOOK, ATTACK
     }
@@ -201,6 +207,7 @@ class DungeonCrawler extends GameView {
         stairsUp = new StaticObject("stairsup.png");;
         stairsDown = new StaticObject("stairsdown.png");;
         load_level();
+        chef.setPosition(100,-300);
         bubble=new Bubble(640-panel_width,360);
     }
 
@@ -215,25 +222,29 @@ class DungeonCrawler extends GameView {
                 load_level1();
                 break;
             case 2:
-                load_level1();
+                load_level2();
+                break;
+            case 3:
+                load_level3();
                 break;
         }
     }
 
     public void load_level0() {
-        gameObjects.add(new Ogre(0,0));
-        gameObjects.add(new Ogre(-100,0));
+        if(story.found_chef) {
+            gameObjects.add(chef);
+        }
         gameObjects.add(stairsDown);
         gameObjects.add(new King());
         gameObjects.add(new Queen(-200,-10));
         ground_texture=load_bitmap("grass.jpg");
-        gameObjects.add(new Chef(300,100));
         gameObjects.add(new tree(200,400));
         gameObjects.add(MyTree);
-        player.x=-120;
-        player.y=-100;
+        player.setPosition(-100,100);
         player.width=190;
         player.height=190;
+        controller.dir_x=0;
+        controller.dir_y=-1;
         MyTree.x=100;
         MyTree.y=100;
         stairsUp.setPosition(-800,0);
@@ -241,11 +252,35 @@ class DungeonCrawler extends GameView {
     }
 
     public void load_level1() {
+        if(story.found_chef) {
+            gameObjects.add(chef);
+        }
+        gameObjects.add(new Ogre(0,0));
+        gameObjects.add(new Ogre(-100,0));
         gameObjects.add(stairsUp);
         gameObjects.add(stairsDown);
         stairsDown.setPosition(-900,100);
         stairsUp.setPosition(-300,-400);
         ground_texture=load_bitmap("stone.png");
+    }
+
+    public void load_level2() {
+        if(story.found_chef) {
+            gameObjects.add(chef);
+        }
+        gameObjects.add(stairsUp);
+        gameObjects.add(stairsDown);
+        stairsDown.setPosition(-900,100);
+        stairsUp.setPosition(-300,-400);
+        ground_texture=load_bitmap("stone.png");
+    }
+
+    public void load_level3() {
+        gameObjects.add(stairsUp);
+        stairsDown.setPosition(-900,100);
+        stairsUp.setPosition(-300,-400);
+        ground_texture=load_bitmap("stone.png");
+        gameObjects.add(chef);
     }
 
     public abstract class Level {
@@ -493,7 +528,12 @@ class DungeonCrawler extends GameView {
             if(distance_to_player < 50) {
                 bubble.active=true;
                 bubble.speaker_image=getBitmap();
-                bubble.text="I WANT FOOD. SAVE THE CHEF";
+                if(story.found_chef) {
+                    bubble.text = "GOOD YOU FOUND HIM.\nI HAVEN'T EATEN FOR HOURS";
+                    story.delivered_chef=true;
+                } else {
+                    bubble.text = "I WANT FOOD. SAVE THE CHEF";
+                }
             }
         }
 
@@ -513,7 +553,12 @@ class DungeonCrawler extends GameView {
             if(distance_to_player < 50) {
                 bubble.active=true;
                 bubble.speaker_image=getBitmap();
-                bubble.text="THE CHEF HAS BEEN KIDNAPPED.\n CAN YOU BRING HIM BACK?";
+                if(story.found_chef) {
+                    bubble.text = "THANK YOU! I WILL FORCE HIM\n TO COOK DINNER IMMEDIATELY";
+                    story.delivered_chef=true;
+                } else {
+                    bubble.text = "THE CHEF HAS BEEN KIDNAPPED.\n CAN YOU BRING HIM BACK?";
+                }
             }
         }
 
@@ -522,16 +567,21 @@ class DungeonCrawler extends GameView {
         public void act() {
             super.act();
             float distance_to_player=distance(player);
-            if(distance_to_player > 150) {
-                // To far away to notice
-                proceed(); // Continue with current action
-                return;
+            if(distance_to_player < 50) {
+                story.found_chef=true;
             }
-            // Notices
-            directTo(player);
-            // Moves to player unless close enough
-            if(distance_to_player > 50) {
-                move();
+            if(story.found_chef) {
+                directTo(player);
+                if(distance_to_player > 100 && !story.delivered_chef) {
+                    move();
+                }
+                if(story.delivered_chef) {
+                    if(distance_to_player < 50) {
+                        bubble.active=true;
+                        bubble.speaker_image=getBitmap();
+                        bubble.text = "IT WAS BETTER DOWN THERE\nWITH THE GOBLINS";
+                    }
+                }
             }
             proceed(); // Continue with current action
         }
@@ -543,7 +593,7 @@ class DungeonCrawler extends GameView {
         }
         public void load() {
             speed=7;
-            looking_image=load_bitmap_360("chef/walking ");
+            looking_image=load_bitmap_360("chefpancake/throwing ");
             running_image=load_bitmap_360("chef/walking ");
             attack_image=load_bitmap_360("chef/walking ");
         }
@@ -703,7 +753,7 @@ class DungeonCrawler extends GameView {
             }
             canvas.drawBitmap(bubble_image,x,y,null);
             if(speaker_image!=null) {
-                canvas.drawBitmap(speaker_image,x+10,y-5,null);
+                canvas.drawBitmap(speaker_image,null,new Rect(x+10,y-5,x+96+10,y+96-5),null);
             }
 
             Paint textpaint = new Paint();
@@ -771,13 +821,19 @@ class DungeonCrawler extends GameView {
             level--;
             load_level();
             player.setPosition(stairsDown.x-100,stairsDown.y-100);
+            if(story.found_chef) {
+                chef.setPosition(stairsDown.x-100,stairsDown.y-150);
+            }
         }
 
-        if(gameObjects.contains(stairsDown) && player.distance(stairsDown)<70) {
+        if(gameObjects.contains(stairsDown) && player.distance(stairsDown)<70 && story.delivered_chef==false) {
             Log.d("hoj","Down");
             level++;
             load_level();
             player.setPosition(stairsUp.x+100,stairsUp.y+100);
+            if(story.found_chef) {
+                chef.setPosition(stairsUp.x+100,stairsUp.y+150);
+            }
         }
 
         // We set bubble.actve to false, one of our objects might override it in act
