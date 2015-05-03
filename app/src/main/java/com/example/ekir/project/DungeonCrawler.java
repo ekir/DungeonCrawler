@@ -223,6 +223,8 @@ class DungeonCrawler extends GameView {
         gameObjects.add(new Ogre(0,0));
         gameObjects.add(new Ogre(-100,0));
         gameObjects.add(stairsDown);
+        gameObjects.add(new King());
+        gameObjects.add(new StaticCharacter("queen/looking ",-200,-10));
         ground_texture=load_bitmap("grass.jpg");
         gameObjects.add(new Chef(300,100));
         gameObjects.add(new tree(200,400));
@@ -335,6 +337,7 @@ class DungeonCrawler extends GameView {
         Bitmap running_image[][] = new Bitmap[8][8];
         boolean attack=false;
         float lookState=0;
+        int lookStateMax=8;
         int walkState=0;
         int attackState=0;
         public Bitmap[][] load_bitmap_360(String basename) {
@@ -352,18 +355,24 @@ class DungeonCrawler extends GameView {
             return return_image;
         }
 
+        public void load() {
+
+        }
+
         public Character() {
             //running_image=load_bitmap_360("running/running ");
             //attack_image=load_bitmap_360("attack/attack ");
             looking_image=load_bitmap_360("ogre/looking ");
             running_image=load_bitmap_360("ogre/running ");
             attack_image=load_bitmap_360("ogre/attack ");
+            load();
         }
 
         public Character(int tx,int ty) {
                 this();
                 this.x=tx;
                 this.y=ty;
+                load();
         }
 
         public int getIndexByAngle() {
@@ -428,13 +437,55 @@ class DungeonCrawler extends GameView {
             switch(action) {
                 case LOOK:
                     lookState = lookState + 0.4f;
-                    lookState = lookState % 8;
+                    lookState = lookState % lookStateMax;
                     break;
             }
         }
         public void act() {
             action=Action.LOOK;
         }
+    }
+    public class StaticCharacter extends Character {
+        String basename="";
+        public void act() {
+            super.act();
+            float distance_to_player = distance(player);
+            // Direct to player
+            directTo(player);
+            // Moves to player unless close enough
+            /*
+            if (distance_to_player < 0) {
+
+            }
+            */
+            proceed(); // Continue with current action
+        }
+        public StaticCharacter(String tbasename) {
+            super();
+            basename=tbasename;
+            load();
+        }
+        public StaticCharacter(String tbasename, int tx,int ty) {
+            super(tx,ty);
+            basename=tbasename;
+            load();
+        }
+        public void load() {
+            looking_image=load_bitmap_360(basename);
+        }
+    }
+    public class King extends StaticCharacter {
+
+        public King() {
+            super("king/spricht ");
+            lookStateMax=6;
+        }
+
+        public King(int tx,int ty) {
+            super("king/spricht ",tx,ty);
+            lookStateMax=5;
+        }
+
     }
     public class Chef extends Character {
         public void act() {
@@ -455,11 +506,9 @@ class DungeonCrawler extends GameView {
         }
         public Chef(int tx,int ty) {
             super(tx,ty);
-            load();
         }
         public Chef() {
             super();
-            load();
         }
         public void load() {
             speed=7;
@@ -487,11 +536,9 @@ class DungeonCrawler extends GameView {
         }
         public Ogre(int tx,int ty) {
             super(tx,ty);
-            load();
         }
         public Ogre() {
             super();
-            load();
         }
         public void load() {
             speed=7;
@@ -543,7 +590,7 @@ class DungeonCrawler extends GameView {
                 }
             } else {
                 lookState = lookState + 0.4f;
-                lookState = lookState % 8;
+                lookState = lookState % lookStateMax;
             }
         }
     }
