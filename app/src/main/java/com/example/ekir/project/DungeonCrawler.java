@@ -847,8 +847,12 @@ class DungeonCrawler extends GameView {
         drawPanel(canvas);
         bubble.draw(canvas);
         for(int n=0;n<controller.points.size();n++) {
-            Point tmp_point=controller.points.get(n);
-            canvas.drawCircle(tmp_point.x,tmp_point.y,50,black);
+            try {
+                Point tmp_point = controller.points.get(n);
+                canvas.drawCircle(tmp_point.x, tmp_point.y, 50, black);
+            } catch(Exception e) {
+
+            }
         }
         if(controller.move) {
             canvas.drawLine(controller.touch_start_x, controller.touch_start_y, controller.touch_current_x, controller.touch_current_y, black);
