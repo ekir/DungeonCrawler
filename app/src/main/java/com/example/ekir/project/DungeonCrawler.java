@@ -85,6 +85,7 @@ class DungeonCrawler extends GameView {
     Camera camera = new Camera();
     abstract class virtButton
     {
+        Bitmap image;
         Rect position;
         public abstract void onClick();
     }
@@ -299,6 +300,7 @@ class DungeonCrawler extends GameView {
                 }
             }
         };
+        btn_Menu.image=load_bitmap("btn_menu.png");
         btn_Attack = new virtButton() {
             public void onClick() {
                 //player.x=10;
@@ -308,6 +310,7 @@ class DungeonCrawler extends GameView {
                 }
             }
         };
+        btn_Attack.image=load_bitmap("btn_menu.png");
         virtScreen.widthScale=w/virtScreen.width;
         virtScreen.heightScale=h/virtScreen.height;
         btn_Menu.position=new Rect(virtScreen.width-100,0,virtScreen.width,50);
@@ -868,7 +871,7 @@ class DungeonCrawler extends GameView {
         paint.setColor(Color.WHITE);
         canvas.drawRect(new Rect(canvas.getWidth()-panel_width,0,canvas.getWidth(),canvas.getHeight()),paint);
         paint.setColor(Color.RED);
-        canvas.drawRect(btn_Menu.position,paint);
-        canvas.drawRect(btn_Attack.position,paint);
+        canvas.drawBitmap(btn_Attack.image,null,btn_Attack.position,null);
+        canvas.drawBitmap(btn_Menu.image,null,btn_Menu.position,null);
     }
 }
