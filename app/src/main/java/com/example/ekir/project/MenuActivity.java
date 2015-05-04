@@ -26,8 +26,13 @@ public class MenuActivity extends Activity{
         btn_play= (Button) findViewById(R.id.btn_play);
         btn_about= (Button) findViewById(R.id.btn_about);
         chk_music = (CheckBox) findViewById(R.id.chk_music);
+        chk_music.setChecked(app.getMusic());
         if(app.gameStarted) {
             btn_resume.setVisibility(View.VISIBLE);
+            btn_play.setVisibility(View.GONE);
+        } else {
+            btn_resume.setVisibility(View.GONE);
+            btn_play.setVisibility(View.VISIBLE);
         }
         btn_resume.setOnClickListener(new View.OnClickListener() {
             @Override

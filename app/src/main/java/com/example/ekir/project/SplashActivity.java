@@ -17,7 +17,7 @@ public class SplashActivity extends Activity{
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             app = (DungeonCrawlerApplication)getApplication();
-            int wait_time = 2000;
+            int wait_time = 3000;
             if(app.fastStart) {
                 wait_time=0;
             }
