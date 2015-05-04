@@ -22,6 +22,7 @@ public class DungeonCrawlerApplication extends Application {
         if(MediaSpelaren!=null) {
             return;
         }
+        music=true;
         MediaSpelaren = MediaPlayer.create(this, R.raw.music);
         MediaSpelaren.setLooping(true);
         MediaSpelaren.setVolume(0.1f, 0.1f);
