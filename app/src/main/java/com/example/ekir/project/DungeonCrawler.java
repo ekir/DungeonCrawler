@@ -85,11 +85,19 @@ class DungeonCrawler extends GameView {
     Camera camera = new Camera();
     abstract class virtButton
     {
+        public void draw(Canvas canvas) {
+            if(visible) {
+                canvas.drawBitmap(image, null, position, null);
+            }
+        }
+        public boolean visible=true;
         Bitmap image;
         Rect position;
         public abstract void onClick();
     }
+    public virtButton btn_The_End;
     public virtButton btn_Menu;
+    public virtButton btn_Help;
     public virtButton btn_Attack;
     public ArrayList<GameObject> gameObjects = new ArrayList<GameObject>();
     public class Controller implements View.OnTouchListener {
@@ -139,7 +147,7 @@ class DungeonCrawler extends GameView {
             for(int n=0;n<points.size();n++) {
                 Point tmp_point=points.get(n);
                 for(i=0;i<virtButtonList.size();i++) {
-                    if(virtButtonList.get(i).position.contains(tmp_point.x,tmp_point.y)) {
+                    if(virtButtonList.get(i).position.contains(tmp_point.x,tmp_point.y) && virtButtonList.get(i).visible==true) {
                         virtButtonList.get(i).onClick();
                     }
                 }
@@ -159,7 +167,7 @@ class DungeonCrawler extends GameView {
                 boolean button_pressed=false;
 
                 for(i=0;i<virtButtonList.size();i++) {
-                    if(virtButtonList.get(i).position.contains(x,y)) {
+                    if(virtButtonList.get(i).position.contains(x,y) && virtButtonList.get(i).visible==true) {
                         virtButtonList.get(i).onClick();
                         button_pressed = true;
                     }
@@ -208,7 +216,7 @@ class DungeonCrawler extends GameView {
         stairsUp = new StaticObject("stairsup.png");;
         stairsDown = new StaticObject("stairsdown.png");;
         load_level();
-        chef.setPosition(100,-300);
+        chef.setPosition(0,-250);
         bubble=new Bubble(640-panel_width,360);
     }
 
@@ -239,7 +247,8 @@ class DungeonCrawler extends GameView {
         gameObjects.add(new King());
         gameObjects.add(new Queen(-200,-10));
         ground_texture=load_bitmap("grass.jpg");
-        gameObjects.add(new tree(200,400));
+        gameObjects.add(new tree(200,200));
+        gameObjects.add(new tree(150,-200));
         gameObjects.add(MyTree);
         player.setPosition(-100,100);
         player.width=190;
@@ -248,8 +257,8 @@ class DungeonCrawler extends GameView {
         controller.dir_y=-1;
         MyTree.x=100;
         MyTree.y=100;
-        stairsUp.setPosition(-800,0);
-        stairsDown.setPosition(-300,-400);
+        stairsUp.setPosition(-2500,0);
+        stairsDown.setPosition(-100,-175);
     }
 
     public void load_level1() {
@@ -260,8 +269,8 @@ class DungeonCrawler extends GameView {
         gameObjects.add(new Ogre(-100,0));
         gameObjects.add(stairsUp);
         gameObjects.add(stairsDown);
-        stairsDown.setPosition(-900,100);
-        stairsUp.setPosition(-300,-400);
+        stairsDown.setPosition(-200,200);
+        stairsUp.setPosition(-200,-200);
         ground_texture=load_bitmap("stone.png");
     }
 
@@ -271,15 +280,15 @@ class DungeonCrawler extends GameView {
         }
         gameObjects.add(stairsUp);
         gameObjects.add(stairsDown);
-        stairsDown.setPosition(-900,100);
-        stairsUp.setPosition(-300,-400);
+        stairsDown.setPosition(-200,150);
+        stairsUp.setPosition(200,-200);
         ground_texture=load_bitmap("stone.png");
     }
 
     public void load_level3() {
         gameObjects.add(stairsUp);
-        stairsDown.setPosition(-900,100);
-        stairsUp.setPosition(-300,-400);
+        stairsDown.setPosition(-2200,-200);
+        stairsUp.setPosition(-200,150);
         ground_texture=load_bitmap("stone.png");
         gameObjects.add(chef);
     }
@@ -301,6 +310,31 @@ class DungeonCrawler extends GameView {
             }
         };
         btn_Menu.image=load_bitmap("btn_menu.png");
+        btn_Help = new virtButton() {
+
+            @Override
+            public void onClick() {
+                play_sound(snd_sword);
+                if(game_paused==false) {
+                    game_paused=true;
+                    ((PlayActivity) getContext()).LaunchMenu();
+                }
+            }
+        };
+        btn_Help.image=load_bitmap("btn_help.png");
+        btn_The_End = new virtButton() {
+
+            @Override
+            public void onClick() {
+                play_sound(snd_sword);
+                if(game_paused==false) {
+                    game_paused=true;
+                    ((PlayActivity) getContext()).LaunchMenu();
+                }
+            }
+        };
+        btn_The_End.visible=false;
+        btn_The_End.image=load_bitmap("btn_the_end.png");
         btn_Attack = new virtButton() {
             public void onClick() {
                 //player.x=10;
@@ -310,12 +344,16 @@ class DungeonCrawler extends GameView {
                 }
             }
         };
-        btn_Attack.image=load_bitmap("btn_menu.png");
+        btn_Attack.image=load_bitmap("btn_attack.png");
         virtScreen.widthScale=w/virtScreen.width;
         virtScreen.heightScale=h/virtScreen.height;
         btn_Menu.position=new Rect(virtScreen.width-100,0,virtScreen.width,50);
+        btn_Help.position=new Rect(virtScreen.width-100,75,virtScreen.width,125);
+        btn_The_End.position=new Rect(270,200,270+100,200+50);
         btn_Attack.position=new Rect(virtScreen.width-100,virtScreen.height-100,virtScreen.width,virtScreen.height-50);
+        controller.add(btn_The_End);
         controller.add(btn_Menu);
+        controller.add(btn_Help);
         controller.add(btn_Attack);
     }
 
@@ -578,11 +616,14 @@ class DungeonCrawler extends GameView {
                 if(distance_to_player > 100 && !story.delivered_chef) {
                     move();
                 }
-                if(story.delivered_chef) {
-                    if(distance_to_player < 50) {
-                        bubble.active=true;
-                        bubble.speaker_image=getBitmap();
+                if(distance_to_player < 50) {
+                    bubble.active=true;
+                    if(story.delivered_chef) {
+                        bubble.speaker_image = getBitmap();
                         bubble.text = "IT WAS BETTER DOWN THERE\nWITH THE GOBLINS";
+                    } else if(level!=0){
+                        bubble.speaker_image = player.getBitmap();
+                        bubble.text="FOLLOW ME UP";
                     }
                 }
             }
@@ -783,7 +824,7 @@ class DungeonCrawler extends GameView {
     Player player = new Player();
     int i=0;
     Bitmap ground_texture;
-    World world = new World(-1000,-1000,1000,1000);
+    World world = new World(-300,-300,300,300);
 
     @Override
     public void gameLoop(Canvas screenCanvas) {
@@ -871,7 +912,9 @@ class DungeonCrawler extends GameView {
         paint.setColor(Color.WHITE);
         canvas.drawRect(new Rect(canvas.getWidth()-panel_width,0,canvas.getWidth(),canvas.getHeight()),paint);
         paint.setColor(Color.RED);
-        canvas.drawBitmap(btn_Attack.image,null,btn_Attack.position,null);
-        canvas.drawBitmap(btn_Menu.image,null,btn_Menu.position,null);
+        btn_Menu.draw(canvas);
+        btn_Attack.draw(canvas);
+        btn_The_End.draw(canvas);
+        btn_Help.draw(canvas);
     }
 }
