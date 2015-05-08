@@ -269,8 +269,6 @@ class DungeonCrawler extends GameView {
         if(story.found_chef) {
             gameObjects.add(chef);
         }
-        gameObjects.add(new Ogre(0,0));
-        gameObjects.add(new Ogre(-100,0));
         gameObjects.add(stairsUp);
         gameObjects.add(stairsDown);
         stairsDown.setPosition(-200,200);
@@ -318,10 +316,9 @@ class DungeonCrawler extends GameView {
 
             @Override
             public void onClick() {
-                play_sound(snd_sword);
                 if(game_paused==false) {
                     game_paused=true;
-                    ((PlayActivity) getContext()).LaunchMenu();
+                    ((PlayActivity) getContext()).LaunchAbout();
                 }
             }
         };
@@ -860,12 +857,7 @@ class DungeonCrawler extends GameView {
         // Show move area
         //canvas.drawRect(controller.moveRect, yellow);
 
-        // Init the paint
-        Paint textpaint = new Paint();
-        textpaint.setTextSize(50);
-        textpaint.setFakeBoldText(true);
-        textpaint.setColor(Color.BLACK);
-        canvas.drawText(Float.toString(level),50,50,textpaint);
+
         if(gameObjects.contains(stairsUp) && player.distance(stairsUp)<70) {
             Log.d("hoj","Up");
             level--;
@@ -914,13 +906,21 @@ class DungeonCrawler extends GameView {
     }
 
     public void drawPanel(Canvas canvas) {
+        Paint textpaint = new Paint();
+        textpaint.setTextSize(20);
+        textpaint.setFakeBoldText(true);
+        textpaint.setColor(Color.BLACK);
+
+        int canvas_left=canvas.getWidth()-panel_width;
+
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
-        canvas.drawRect(new Rect(canvas.getWidth()-panel_width,0,canvas.getWidth(),canvas.getHeight()),paint);
+        canvas.drawRect(new Rect(canvas_left,0,canvas.getWidth(),canvas.getHeight()),paint);
         paint.setColor(Color.RED);
         btn_Menu.draw(canvas);
         btn_Attack.draw(canvas);
         btn_The_End.draw(canvas);
         btn_Help.draw(canvas);
+        canvas.drawText("Level "+Integer.toString(level),canvas_left,160,textpaint);
     }
 }

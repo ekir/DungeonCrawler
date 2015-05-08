@@ -23,6 +23,11 @@ import java.util.Random;
 public class PlayActivity extends Activity{
     DungeonCrawler dungeonCrawler;
     DungeonCrawlerApplication app;
+    public void LaunchAbout() {
+        Intent intent = new Intent(PlayActivity.this, AboutActivity.class);
+        PlayActivity.this.startActivity(intent);
+    }
+
     public void LaunchMenu() {
         Intent intent = new Intent(PlayActivity.this, MenuActivity.class);
         PlayActivity.this.startActivity(intent);
