@@ -1,4 +1,5 @@
 package com.example.ekir.project;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,6 +29,7 @@ class DungeonCrawler extends GameView {
     GameObject stairsDown;
     Chef chef = new Chef();
     Bubble bubble;
+    DungeonCrawlerApplication app;
     class Story {
         boolean found_chef = false;
         boolean delivered_chef = false;
@@ -218,6 +220,8 @@ class DungeonCrawler extends GameView {
         load_level();
         chef.setPosition(0,-250);
         bubble=new Bubble(640-panel_width,360);
+        Activity activity = (Activity)getContext();
+        app=(DungeonCrawlerApplication)activity.getApplication();
     }
 
     public void load_level() {
@@ -328,6 +332,7 @@ class DungeonCrawler extends GameView {
             public void onClick() {
                 play_sound(snd_sword);
                 if(game_paused==false) {
+                    app.gameStarted=false;
                     game_paused=true;
                     ((PlayActivity) getContext()).LaunchMenu();
                 }
@@ -621,6 +626,7 @@ class DungeonCrawler extends GameView {
                     if(story.delivered_chef) {
                         bubble.speaker_image = getBitmap();
                         bubble.text = "IT WAS BETTER DOWN THERE\nWITH THE GOBLINS";
+                        btn_The_End.visible=true;
                     } else if(level!=0){
                         bubble.speaker_image = player.getBitmap();
                         bubble.text="FOLLOW ME UP";

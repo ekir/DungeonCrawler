@@ -17,7 +17,7 @@
     <Button
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="Resume"
+        android:text="Resume game"
         android:id="@+id/btn_resume"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -28,7 +28,7 @@
     <Button
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="Play"
+        android:text="New game"
         android:id="@+id/btn_play"
         android:layout_below="@+id/btn_resume"
         android:layout_alignParentTop="true"
