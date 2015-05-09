@@ -5,7 +5,7 @@ android {
     buildToolsVersion "21.1.2"
 
     defaultConfig {
-        applicationId "com.example.ekir.project"
+        applicationId "se.erikgustafsson.ekir.lostchef"
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1

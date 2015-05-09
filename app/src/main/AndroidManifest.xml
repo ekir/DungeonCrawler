@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ekir.project" >
+    package="com.erikgustafsson.ekir.project" >
 
     <application
-        android:name=".DungeonCrawlerApplication"
+        android:name="se.erikgustafsson.ekir.lostchef.DungeonCrawlerApplication"
         android:allowBackup="true"
         android:icon="@mipmap/dungeoncrawlericon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".PlayActivity"
+            android:name="se.erikgustafsson.ekir.lostchef.PlayActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
-            android:name=".SplashActivity"
+            android:name="se.erikgustafsson.ekir.lostchef.SplashActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
             <intent-filter>
@@ -26,14 +26,14 @@
         </activity>
         <activity
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
-            android:name=".MenuActivity"
+            android:name="se.erikgustafsson.ekir.lostchef.MenuActivity"
             android:label="@string/title_activity_menu"
             android:screenOrientation="landscape" >
         </activity>
         <activity
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
             android:screenOrientation="landscape"
-            android:name=".AboutActivity"
+            android:name="se.erikgustafsson.ekir.lostchef.AboutActivity"
             android:label="@string/title_activity_about" >
         </activity>
     </application>

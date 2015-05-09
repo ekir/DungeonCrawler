@@ -1,7 +1,6 @@
-package com.example.ekir.project;
+package se.erikgustafsson.ekir.lostchef;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -15,10 +14,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.erikgustafsson.ekir.project.R;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Random;
 
 /**
  * This class describes the itself. It extends GameView which is my game engine

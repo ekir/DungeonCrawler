@@ -1,10 +1,11 @@
-package com.example.ekir.project;
+package se.erikgustafsson.ekir.lostchef;
 
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.erikgustafsson.ekir.project.R;
 
 
 public class AboutActivity extends Activity {

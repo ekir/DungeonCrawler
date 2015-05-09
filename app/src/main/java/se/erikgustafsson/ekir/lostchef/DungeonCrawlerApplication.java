@@ -1,10 +1,9 @@
-package com.example.ekir.project;
+package se.erikgustafsson.ekir.lostchef;
 
 import android.app.Application;
-import android.content.Context;
 import android.media.MediaPlayer;
 
-import com.example.ekir.project.R;
+import com.erikgustafsson.ekir.project.R;
 
 /**
  * This is the data shared between activities
