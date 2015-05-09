@@ -24,9 +24,21 @@ This game was made by Erik Gustafsson as a final project for a course in Android
 
 \n\n
 Erik developed all the code in this game. The graphics and sounds come from third party online resources
-    </string>
-    <string name="credits">
-        Graphics by... Sound by
+</string>
+<string name="credits">
+Sprite graphics:\n
+Reiners Tilesets\n
+http://www.reinerstilesets.de/\n
+\n
+Textures:\n
+http://www.cgtextures.com/\n
+\n
+Sound effect(sword):\n
+http://freesound.org/people/audione/sounds/52458/\n
+\n
+Music:\n
+Preziosa Overture by Carl Maria von Weber\n
+Lived 1786-1826 in Germany
     </string>
     <string name="game_title">Legend of the lost chef</string>
     <string name="app_name">Lost Chef</string>
@@ -37,3 +49,5 @@ Erik developed all the code in this game. The graphics and sounds come from thir
     <string name="title_activity_about">AboutActivity</string>
     <string name="title_activity_credits">CreditsActivity</string>
 </resources>
+
+
