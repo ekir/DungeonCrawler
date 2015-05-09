@@ -22,8 +22,11 @@ About the developer\n
 This game was made by Erik Gustafsson as a final project for a course in Android Game development at Högskola Kristianstad. Erik is a 28 years old master student in computer science from Uppsala
 
 
-
-
+\n\n
+Erik developed all the code in this game. The graphics and sounds come from third party online resources
+    </string>
+    <string name="credits">
+        Graphics by... Sound by
     </string>
     <string name="game_title">Legend of the lost chef</string>
     <string name="app_name">Lost Chef</string>
@@ -32,4 +35,5 @@ This game was made by Erik Gustafsson as a final project for a course in Android
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_menu">MenuActivity</string>
     <string name="title_activity_about">AboutActivity</string>
+    <string name="title_activity_credits">CreditsActivity</string>
 </resources>
